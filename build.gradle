@@ -1,0 +1,16 @@
+group 'net.fexcraft.app.json'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+version = "1.0"
+
+repositories {}
+
+sourceSets {
+    main {
+        java {
+            srcDirs "src"
+        }
+    }
+}
