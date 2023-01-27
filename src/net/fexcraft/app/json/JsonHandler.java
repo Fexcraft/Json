@@ -101,8 +101,9 @@ public class JsonHandler {
 						str = RET.str;
 					}
 					else if(s == '['){
+						String tkey = key.asString();
 						parseArray(new JsonArray(), str);
-						root.add(key.asString(), RET.obj);
+						root.add(tkey, RET.obj);
 						str = RET.str;
 					}
 					else if(s == '"'){
