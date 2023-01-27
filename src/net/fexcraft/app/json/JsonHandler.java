@@ -1,11 +1,9 @@
 package net.fexcraft.app.json;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.lib.common.utils.Print;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -31,26 +29,35 @@ public class JsonHandler {
 	private static String FLOATN = "^\\-?\\d+\\.\\d+$";
 	
 	public static JsonObject<?> parse(String str, boolean defmap){
-		return parse(new CharList(str), defmap);
+		return parse(new ByteArrayInputStream(str.getBytes()), defmap);
 	}
 	
-	public static JsonObject<?> parse(CharList str, boolean defmap){
+	public static JsonObject<?> parse(InputStream stream, boolean defmap){
 		JsonObject<?> root = null;
 		Parser parser = new Parser();
-		str = parser.trim(str);
-		if(str.starts('{')){
-			root = parser.parseMap(new JsonMap(), str).obj;
+		//long time = Time.getDate();
+		ISW isw = new ISW(stream);
+		try{
+			isw.next();
+			if(isw.starts('{')){
+				root = parser.parseMap(new JsonMap(), isw);
+			}
+			else if(isw.starts('[')){
+				root = parser.parseArray(new JsonArray(), isw);
+			}
+			else root = defmap ? new JsonMap() : new JsonArray();
 		}
-		else if(str.starts('[')){
-			root = parser.parseArray(new JsonArray(), str).obj;
+		catch(Exception e){
+			e.printStackTrace();
+			return defmap ? new JsonMap() : new JsonArray();
 		}
-		else return defmap ? new JsonMap() : new JsonArray();
+		//Print.console("Time taken: " + (Time.getDate() - time));
 		return root;
 	}
 
 	public static JsonObject<?> parse(File file, boolean defmap){
 		try{
-			return parse(new CharList(new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8)), defmap);
+			return parse(new FileInputStream(file), defmap);
 		}
 		catch(IOException e){
 			e.printStackTrace();
@@ -62,99 +69,63 @@ public class JsonHandler {
 		return parse(file, true).asMap();
 	}
 
-	public static JsonObject<?> parse(InputStream stream, boolean defmap) throws IOException {
-		BufferedInputStream bis = new BufferedInputStream(stream);
-		ByteArrayOutputStream buf = new ByteArrayOutputStream();
-		for(int res = bis.read(); res != -1; res = bis.read()) buf.write((byte)res);
-		String str = buf.toString(StandardCharsets.UTF_8.name());
-		bis.close(); buf.close();
-		return parse(new CharList(str), defmap);
-	}
-
 	public static JsonMap parse(InputStream stream) throws IOException {
 		return parse(stream, true).asMap();
 	}
 	
 	private static class Parser {
-		
-		private final Ret RET = new Ret();
-		private final CharList COPY = new CharList();
-		private CharList key = null, val = null;
-		private char s = ' ';
-		private int index = 0;
 
-		private Ret parseMap(JsonMap root, CharList str){
-			if(str.starts('{')) str = sub(str, 1);
-			while(str.size() > 0){
-				str = trim(str);
-				s = str.get(0);
-				if(s == '"'){
-					key = scanTill(str, '"');
-					str = sub(str, key.size() + 1);
-					key = sub(key, 1);
-					str = trim(sub(trim(str), 1));//removing colon
-					s = str.get(0);
-					if(s == '{'){
-						String tkey = key.asString();
-						parseMap(new JsonMap(), str);
-						root.add(tkey, RET.obj);
-						str = RET.str;
+		private JsonObject<?> parseMap(JsonMap root, ISW isw) throws IOException {
+			if(isw.starts('{')) isw.next();
+			while(isw.has()){
+				isw.skip();
+				if(isw.cher == '"'){
+					String key = isw.till('"');
+					isw.skip();
+					isw.next();//skipping colon
+					isw.skip();
+					if(isw.cher == '{'){
+						root.add(key, parseMap(new JsonMap(), isw));
 					}
-					else if(s == '['){
-						String tkey = key.asString();
-						parseArray(new JsonArray(), str);
-						root.add(tkey, RET.obj);
-						str = RET.str;
+					else if(isw.cher == '['){
+						root.add(key, parseArray(new JsonArray(), isw));
 					}
-					else if(s == '"'){
-						val = scanTill(str, '"');
-						str = sub(str, val.size() + 1);
-						root.add(key.asString(), parseValue(sub(val, 1).asString()));
+					else if(isw.cher == '"'){
+						root.add(key, parseValue(isw.till('"')));
 					}
 					else{
-						val = scanTill(str, ',');
-						str = sub(str, val.size());
-						root.add(key.asString(), parseValue(val.asString()));
+						root.add(key, parseValue(isw.till()));
 					}
 				}
-				else if(s == ',') str = sub(str, 1);
-				else if(s == '}') break;
-				else str = sub(str, 1);
+				else if(isw.cher == ',') isw.next();
+				else if(isw.cher == '}') break;
+				else isw.next();
 			}
-			if(str.starts('}')) str = sub(str, 1);
-			return RET.set(root, str);
+			if(isw.starts('}')) isw.next();
+			return root;
 		}
 
-		private Ret parseArray(JsonArray root, CharList str){
-			if(str.starts('[')) str = sub(str, 1);
-			while(str.size() > 0){
-				str = trim(str);
-				s = str.get(0);
-				if(s == '"'){
-					val = scanTill(str, '"');
-					str = sub(str, val.size() + 1);
-					root.add(parseValue(sub(val, 1).asString()));
+		private JsonObject<?>  parseArray(JsonArray root, ISW isw) throws IOException {
+			if(isw.starts('[')) isw.next();
+			while(isw.has()){
+				isw.skip();
+				if(isw.cher == '"'){
+					root.add(parseValue(isw.till('"')));
 				}
-				else if(s == '{'){
-					parseMap(new JsonMap(), str);
-					root.add(RET.obj);
-					str = RET.str;
+				else if(isw.cher == '{'){
+					root.add(parseMap(new JsonMap(), isw));
 				}
-				else if(s == '['){
-					parseArray(new JsonArray(), str);
-					root.add(RET.obj);
-					str = RET.str;
+				else if(isw.cher == '['){
+					root.add(parseArray(new JsonArray(), isw));
 				}
-				else if(s == ',') str = sub(str, 1);
-				else if(s == ']') break;
+				else if(isw.cher == ',') isw.next();
+				else if(isw.cher == ']') break;
 				else {
-					val = scanTill(str, ',');
-					str = sub(str, val.size());
-					root.add(parseValue(val.asString()));
+					root.add(parseValue(isw.till()));
 				}
 			}
-			if(str.starts(']')) str = sub(str, 1);
-			return RET.set(root, str);
+			if(isw.starts(']')) isw.next();
+			return root;
 		}
 
 		private static JsonObject<?> parseValue(String val){
@@ -176,65 +147,62 @@ public class JsonHandler {
 			else if(val.equals("false")) return new JsonObject<>(false);
 			else return new JsonObject<>(val);
 		}
-
-		private CharList scanTill(CharList str, char c){
-			index = 1;
-			while(index < str.size() && end(str.get(index), c) /*&& str.get(index - 1) != '\\'*/) index++;
-			return sub(str, 0, index);
-		}
-
-		private static boolean end(char e, char c){
-			return e != c && e != ']' && e != '}';
-		}
-		
-		private CharList sub(CharList str, int b){
-			while(b > 0){
-				str.remove(0);
-				b--;
-			}
-			return str;
-		}
-		
-		private CharList sub(CharList str, int b, int e){
-			CharList list = new CharList();
-			for(int i = b; i < e; i++) list.add(str.get(i));
-			return list;
-		}
-		
-		private CharList trim(CharList str){
-			int s = 0, z = str.size();
-			while(s < z && str.get(s) <= ' ') s++;
-			while(s < z && str.get(z - 1) <= ' ') z--;
-			if(s > 0 || z < str.size()){
-				COPY.addAll(str);
-				str.clear();
-				for(int i = s; i < z; i++) str.add(COPY.get(i));
-				COPY.clear();
-				return str;
-			}
-			else return str;
-		}
 		
 	}
 	
-	public static class CharList extends ArrayList<Character> {
+	public static class ISW {
 
-		public CharList(){}
+		protected InputStreamReader stream;
+		protected char cher;
+		protected boolean has = true;
 
-		public CharList(String str){
-			for(char c : str.toCharArray()) add(c);
+		public ISW(InputStream stream){
+			this.stream = new InputStreamReader(stream, StandardCharsets.UTF_8);
 		}
 
-		public String asString(){
+		public boolean starts(char c) throws IOException {
+			return cher == c;
+		}
+
+		private void next() throws IOException {
+			int i = stream.read();
+			if(i < 0){
+				has = false;
+				return;
+			}
+			cher = (char)i;
+		}
+
+		public boolean has(){
+			return has;
+		}
+
+		public void skip() throws IOException {
+			if(has && cher <= ' '){
+				next();
+				skip();
+			}
+		}
+
+		public String till(char c) throws IOException {
 			StringBuffer buffer = new StringBuffer();
-			for(char c : this) buffer.append(c);
+			if(cher == '"') next();
+			while(has && cher != c){
+				buffer.append(cher);
+				next();
+			}
+			next();
 			return buffer.toString();
 		}
 
-		public boolean starts(char c){
-			return get(0) == c;
+		public String till() throws IOException {
+			StringBuffer buffer = new StringBuffer();
+			while(has && cher != ',' && cher != '}' && cher != ']'){
+				buffer.append(cher);
+				next();
+			}
+			return buffer.toString();
 		}
-		
 	}
 
 	public static String toString(JsonObject<?> obj){
@@ -311,19 +279,6 @@ public class JsonHandler {
 		}
 		
 	}
-	
-	private static class Ret {
-		
-		private JsonObject<?> obj;
-		private CharList str;
-		
-		public Ret set(JsonObject<?> obj, CharList str){
-			this.obj = obj;
-			this.str = str;
-			return this;
-		}
-		
-	}
 
 	public static void print(File file, JsonObject<?> obj, PrintOption opt){
 		try{
@@ -395,7 +350,7 @@ public class JsonHandler {
 	}
 
 	public static Object dewrap(String obj){
-		return dewrap(parse(new CharList(obj), true).asMap());
+		return dewrap(parse(obj, true).asMap());
 	}
 
 	public static HashMap<String, Object> dewrap(JsonMap map){
