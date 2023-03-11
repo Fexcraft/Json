@@ -1,9 +1,12 @@
 package net.fexcraft.app.json;
 
-import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.common.utils.Print;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -178,7 +181,7 @@ public class JsonHandler {
 		}
 
 		public void skip() throws IOException {
-			if(has && cher <= ' '){
+			if(has && (cher <= ' ' || cher == '\n' || cher == '\r')){
 				next();
 				skip();
 			}
