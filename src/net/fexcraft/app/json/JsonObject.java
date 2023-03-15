@@ -60,4 +60,8 @@ public class JsonObject<V> implements FJson {
 		return (Boolean)value;
 	}
 
+	public JsonObject<V> copy(){
+		return new JsonObject<V>(value);
+	}
+
 }
