@@ -125,4 +125,13 @@ public class JsonArray extends JsonObject<List<JsonObject<?>>> {
 		return JsonHandler.toString(this);
 	}
 
+	@Override
+	public JsonArray copy(){
+		JsonArray arr = new JsonArray();
+		for(JsonObject elm : elements()){
+			arr.add(elm.copy());
+		}
+		return arr;
+	}
+
 }
