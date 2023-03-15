@@ -176,4 +176,13 @@ public class JsonMap extends JsonObject<Map<String, JsonObject<?>>> {
 		return value.containsKey(key) ? UUID.fromString(value.get(key).string_value()) : def;
 	}
 
+	@Override
+	public JsonMap copy(){
+		JsonMap map = new JsonMap();
+		for(Entry<String, JsonObject<?>> entry : entries()){
+			map.add(entry.getKey(), entry.getValue().copy());
+		}
+		return map;
+	}
+
 }
