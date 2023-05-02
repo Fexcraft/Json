@@ -18,6 +18,19 @@ public class JsonMap extends JsonObject<Map<String, JsonObject<?>>> {
 	public JsonMap(){
 		value = new LinkedHashMap<>();
 	}
+
+	public JsonMap(Object... elms){
+		this();
+		for(int i = 0; i < elms.length; i += 2){
+			if(i + 1 >= elms.length) break;
+			if(elms[i + 1] instanceof JsonObject){
+				add(elms[i].toString(), (JsonObject<?>)elms[i + 1]);
+			}
+			else{
+				add(elms[i].toString(), new JsonObject<>(elms[i + 1]));
+			}
+		}
+	}
 	
 	public <V> JsonObject<V> get(String key){
 		return (JsonObject<V>)value.get(key);
