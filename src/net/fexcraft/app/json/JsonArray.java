@@ -17,6 +17,11 @@ public class JsonArray extends JsonObject<List<JsonObject<?>>> {
 	public JsonArray(int size){
 		value = new ArrayList<>(size);
 	}
+
+	public JsonArray(Object... elms){
+		this();
+		for(Object elm : elms) add(new JsonObject<>(elm));
+	}
 	
 	public boolean add(JsonObject<?> elm){
 		return value.add(elm);
