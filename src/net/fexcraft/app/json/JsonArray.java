@@ -139,4 +139,22 @@ public class JsonArray extends JsonObject<List<JsonObject<?>>> {
 		return arr;
 	}
 
+	public String[] toStringArray(){
+		String[] str = new String[value.size()];
+		for(int i = 0; i < str.length; i++) str[i] = value.get(i).string_value();
+		return str;
+	}
+
+	public int[] toIntegerArray(){
+		int[] arr = new int[value.size()];
+		for(int i = 0; i < arr.length; i++) arr[i] = value.get(i).integer_value();
+		return arr;
+	}
+
+	public float[] toFloatArray(){
+		float[] arr = new float[value.size()];
+		for(int i = 0; i < arr.length; i++) arr[i] = value.get(i).float_value();
+		return arr;
+	}
+
 }
