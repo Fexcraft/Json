@@ -8,7 +8,7 @@ import java.util.List;
  * @author Ferdinand Calo' (FEX___96)
  *
  */
-public class JsonArray extends JsonObject<List<JsonObject<?>>> {
+public class JsonArray extends JsonValue<List<JsonValue<?>>> {
 	
 	public JsonArray(){
 		value = new ArrayList<>();
@@ -20,18 +20,18 @@ public class JsonArray extends JsonObject<List<JsonObject<?>>> {
 
 	public JsonArray(Object... elms){
 		this();
-		for(Object elm : elms) add(new JsonObject<>(elm));
+		for(Object elm : elms) add(new JsonValue<>(elm));
 	}
 	
-	public boolean add(JsonObject<?> elm){
+	public boolean add(JsonValue<?> elm){
 		return value.add(elm);
 	}
 	
-	public boolean rem(JsonObject<?> elm){
+	public boolean rem(JsonValue<?> elm){
 		return value.remove(elm);
 	}
 	
-	public JsonObject<?> get(int index){
+	public JsonValue<?> get(int index){
 		return value.get(index);
 	}
 	
@@ -43,15 +43,15 @@ public class JsonArray extends JsonObject<List<JsonObject<?>>> {
 		return value.get(index).asMap();
 	}
 	
-	public JsonObject<?> rem(int index){
+	public JsonValue<?> rem(int index){
 		return value.remove(index);
 	}
 	
-	public JsonObject<?> set(int index, JsonObject<?> elm){
+	public JsonValue<?> set(int index, JsonValue<?> elm){
 		return value.set(index, elm);
 	}
 	
-	public boolean contains(JsonObject<?> val){
+	public boolean contains(JsonValue<?> val){
 		return value.contains(val);
 	}
 	
@@ -66,39 +66,39 @@ public class JsonArray extends JsonObject<List<JsonObject<?>>> {
 	}
 	
 	public boolean add(String val){
-		return add(new JsonObject<String>(val));
+		return add(new JsonValue<String>(val));
 	}
 	
 	public boolean add(byte val){
-		return add(new JsonObject<Byte>(val));
+		return add(new JsonValue<Byte>(val));
 	}
 	
 	public boolean add(char val){
-		return add(new JsonObject<Character>(val));
+		return add(new JsonValue<Character>(val));
 	}
 	
 	public boolean add(short val){
-		return add(new JsonObject<Short>(val));
+		return add(new JsonValue<Short>(val));
 	}
 	
 	public boolean add(int val){
-		return add(new JsonObject<Integer>(val));
+		return add(new JsonValue<Integer>(val));
 	}
 	
 	public boolean add(long val){
-		return add(new JsonObject<Long>(val));
+		return add(new JsonValue<Long>(val));
 	}
 	
 	public boolean add(float val){
-		return add(new JsonObject<Float>(val));
+		return add(new JsonValue<Float>(val));
 	}
 	
 	public boolean add(double val){
-		return add(new JsonObject<Double>(val));
+		return add(new JsonValue<Double>(val));
 	}
 	
 	public boolean add(boolean val){
-		return add(new JsonObject<Boolean>(val));
+		return add(new JsonValue<Boolean>(val));
 	}
 	
 	public boolean addArray(){
@@ -121,7 +121,7 @@ public class JsonArray extends JsonObject<List<JsonObject<?>>> {
 		return value.size() > 0;
 	}
 
-	public List<JsonObject<?>> elements(){
+	public List<JsonValue<?>> elements(){
 		return value;
 	}
 	
@@ -133,7 +133,7 @@ public class JsonArray extends JsonObject<List<JsonObject<?>>> {
 	@Override
 	public JsonArray copy(){
 		JsonArray arr = new JsonArray();
-		for(JsonObject elm : elements()){
+		for(JsonValue elm : elements()){
 			arr.add(elm.copy());
 		}
 		return arr;
@@ -155,6 +155,24 @@ public class JsonArray extends JsonObject<List<JsonObject<?>>> {
 		float[] arr = new float[value.size()];
 		for(int i = 0; i < arr.length; i++) arr[i] = value.get(i).float_value();
 		return arr;
+	}
+
+	public ArrayList<String> toStringList(){
+		ArrayList<String> list = new ArrayList();
+		for(JsonValue val : value) list.add(val.string_value());
+		return list;
+	}
+
+	public ArrayList<Integer> toIntegerList(){
+		ArrayList<Integer> list = new ArrayList();
+		for(JsonValue val : value) list.add(val.integer_value());
+		return list;
+	}
+
+	public ArrayList<Float> toFloatList(){
+		ArrayList<Float> list = new ArrayList();
+		for(JsonValue val : value) list.add(val.float_value());
+		return list;
 	}
 
 }
