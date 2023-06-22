@@ -61,7 +61,7 @@ public class JsonArray extends JsonValue<List<JsonValue<?>>> {
 	}
 	
 	@Override
-	public boolean isObject(){
+	public boolean isValue(){
 		return false;
 	}
 	
