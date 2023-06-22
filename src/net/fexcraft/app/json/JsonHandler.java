@@ -31,12 +31,12 @@ public class JsonHandler {
 	private static String NUMBER = "^\\-?\\d+$";
 	private static String FLOATN = "^\\-?\\d+\\.\\d+$";
 	
-	public static JsonObject<?> parse(String str, boolean defmap){
+	public static JsonValue<?> parse(String str, boolean defmap){
 		return parse(new ByteArrayInputStream(str.getBytes()), defmap);
 	}
 	
-	public static JsonObject<?> parse(InputStream stream, boolean defmap){
-		JsonObject<?> root = null;
+	public static JsonValue<?> parse(InputStream stream, boolean defmap){
+		JsonValue<?> root = null;
 		Parser parser = new Parser();
 		//long time = Time.getDate();
 		ISW isw = new ISW(stream);
@@ -58,7 +58,7 @@ public class JsonHandler {
 		return root;
 	}
 
-	public static JsonObject<?> parse(File file, boolean defmap){
+	public static JsonValue<?> parse(File file, boolean defmap){
 		try{
 			return parse(new FileInputStream(file), defmap);
 		}
@@ -78,7 +78,7 @@ public class JsonHandler {
 	
 	private static class Parser {
 
-		private JsonObject<?> parseMap(JsonMap root, ISW isw) throws IOException {
+		private JsonValue<?> parseMap(JsonMap root, ISW isw) throws IOException {
 			if(isw.starts('{')) isw.next();
 			while(isw.has()){
 				isw.skip();
@@ -108,7 +108,7 @@ public class JsonHandler {
 			return root;
 		}
 
-		private JsonObject<?>  parseArray(JsonArray root, ISW isw) throws IOException {
+		private JsonValue<?> parseArray(JsonArray root, ISW isw) throws IOException {
 			if(isw.starts('[')) isw.next();
 			while(isw.has()){
 				isw.skip();
@@ -131,24 +131,24 @@ public class JsonHandler {
 			return root;
 		}
 
-		private static JsonObject<?> parseValue(String val){
+		private static JsonValue<?> parseValue(String val){
 			val = val.trim();
 			if(val.equals("null")){
-				return new JsonObject<String>(val);//new JsonObject<Object>(null);
+				return new JsonValue<String>(val);//new JsonObject<Object>(null);
 			}
 			else if(Pattern.matches(NUMBER, val)){
 				long leng = Long.parseLong(val);
 				if(leng < Integer.MAX_VALUE){
-					return new JsonObject<>((int)leng);
+					return new JsonValue<>((int)leng);
 				}
-				else return new JsonObject<>(leng);
+				else return new JsonValue<>(leng);
 			}
 			else if(Pattern.matches(FLOATN, val)){
-				return new JsonObject<>(Float.parseFloat(val));
+				return new JsonValue<>(Float.parseFloat(val));
 			}
-			else if(val.equals("true")) return new JsonObject<>(true);
-			else if(val.equals("false")) return new JsonObject<>(false);
-			else return new JsonObject<>(val);
+			else if(val.equals("true")) return new JsonValue<>(true);
+			else if(val.equals("false")) return new JsonValue<>(false);
+			else return new JsonValue<>(val);
 		}
 		
 	}
@@ -208,15 +208,15 @@ public class JsonHandler {
 		}
 	}
 
-	public static String toString(JsonObject<?> obj){
+	public static String toString(JsonValue<?> obj){
 		return toString(obj, 0, false, PrintOption.DEFAULT);
 	}
 
-	public static String toString(JsonObject<?> obj, PrintOption opt){
+	public static String toString(JsonValue<?> obj, PrintOption opt){
 		return toString(obj, 0, false, opt);
 	}
 
-	public static String toString(JsonObject<?> obj, int depth, boolean append, PrintOption opt){
+	public static String toString(JsonValue<?> obj, int depth, boolean append, PrintOption opt){
 		String ret = "", tab = "", tabo = "    ", space = opt.spaced ? " " : "", colspace = !opt.flat || opt.spaced ? " " : "";
 		String app = append ? "," + space : "", n = opt.flat ? "" : "\n";
 		if(!opt.flat){
@@ -234,9 +234,9 @@ public class JsonHandler {
 			}
 			else{
 				ret += "{" + space + n;
-				Iterator<Entry<String, JsonObject<?>>> it = obj.asMap().value.entrySet().iterator();
+				Iterator<Entry<String, JsonValue<?>>> it = obj.asMap().value.entrySet().iterator();
 				while(it.hasNext()){
-					Map.Entry<String, JsonObject<?>> entry = it.next();
+					Map.Entry<String, JsonValue<?>> entry = it.next();
 					ret += tab + tabo + '"' + entry.getKey() + '"' + ":" + colspace + toString(entry.getValue(), depth + 1, it.hasNext(), opt);
 				}
 				ret += tab + space + "}" + app + n;
@@ -248,7 +248,7 @@ public class JsonHandler {
 			}
 			else{
 				ret += "[" + space + n;
-				Iterator<JsonObject<?>> it = obj.asArray().value.iterator();
+				Iterator<JsonValue<?>> it = obj.asArray().value.iterator();
 				while(it.hasNext()){
 					ret += tab + tabo + toString(it.next(), depth + 1, it.hasNext(), opt);
 				}
@@ -283,7 +283,7 @@ public class JsonHandler {
 		
 	}
 
-	public static void print(File file, JsonObject<?> obj, PrintOption opt){
+	public static void print(File file, JsonValue<?> obj, PrintOption opt){
 		try{
 			Files.write(file.toPath(), toString(obj, opt).getBytes(StandardCharsets.UTF_8));
 		}
@@ -358,7 +358,7 @@ public class JsonHandler {
 
 	public static HashMap<String, Object> dewrap(JsonMap map){
 		HashMap<String, Object> hashmap = new HashMap<>();
-		for(Entry<String, JsonObject<?>> entry : map.entries()){
+		for(Entry<String, JsonValue<?>> entry : map.entries()){
 			if(entry.getValue().isMap()){
 				hashmap.put(entry.getKey(), dewrap(entry.getValue().asMap()));
 			}
@@ -374,7 +374,7 @@ public class JsonHandler {
 
 	public static ArrayList<Object> dewrap(JsonArray array){
 		ArrayList<Object> list = new ArrayList<>();
-		for(JsonObject<?> obj : array.value){
+		for(JsonValue<?> obj : array.value){
 			if(obj.isMap()){
 				list.add(dewrap(obj.asMap()));
 			}
@@ -390,7 +390,7 @@ public class JsonHandler {
 
 	public static <T> ArrayList<T> dewrapc(JsonArray array){
 		ArrayList<Object> list = new ArrayList<>();
-		for(JsonObject<?> obj : array.value){
+		for(JsonValue<?> obj : array.value){
 			if(obj.isMap()){
 				list.add(dewrap(obj.asMap()));
 			}
