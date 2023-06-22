@@ -24,7 +24,7 @@ public class JsonValue<V> implements FJson {
 	}
 
 	@Override
-	public boolean isObject(){
+	public boolean isValue(){
 		return true;
 	}
 	
@@ -54,6 +54,10 @@ public class JsonValue<V> implements FJson {
 
 	public boolean isNumber(){
 		return value instanceof Number;
+	}
+
+	public boolean isBoolean(){
+		return value instanceof Boolean;
 	}
 
 	public boolean bool(){
