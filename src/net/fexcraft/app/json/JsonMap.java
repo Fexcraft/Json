@@ -88,7 +88,7 @@ public class JsonMap extends JsonValue<Map<String, JsonValue<?>>> {
 	}
 	
 	@Override
-	public boolean isObject(){
+	public boolean isValue(){
 		return false;
 	}
 	
