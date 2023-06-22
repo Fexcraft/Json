@@ -15,7 +15,7 @@ public interface FJson {
 		return false;
 	}
 	
-	public default boolean isObject(){
+	public default boolean isValue(){
 		return false;
 	}
 	
