@@ -13,7 +13,7 @@ import java.util.UUID;
  * @author Ferdinand Calo' (FEX___96)
  *
  */
-public class JsonMap extends JsonObject<Map<String, JsonObject<?>>> {
+public class JsonMap extends JsonValue<Map<String, JsonValue<?>>> {
 	
 	public JsonMap(){
 		value = new LinkedHashMap<>();
@@ -23,17 +23,17 @@ public class JsonMap extends JsonObject<Map<String, JsonObject<?>>> {
 		this();
 		for(int i = 0; i < elms.length; i += 2){
 			if(i + 1 >= elms.length) break;
-			if(elms[i + 1] instanceof JsonObject){
-				add(elms[i].toString(), (JsonObject<?>)elms[i + 1]);
+			if(elms[i + 1] instanceof JsonValue){
+				add(elms[i].toString(), (JsonValue<?>)elms[i + 1]);
 			}
 			else{
-				add(elms[i].toString(), new JsonObject<>(elms[i + 1]));
+				add(elms[i].toString(), new JsonValue<>(elms[i + 1]));
 			}
 		}
 	}
 	
-	public <V> JsonObject<V> get(String key){
-		return (JsonObject<V>)value.get(key);
+	public <V> JsonValue<V> get(String key){
+		return (JsonValue<V>)value.get(key);
 	}
 	
 	public JsonArray getArray(String key){
@@ -47,7 +47,7 @@ public class JsonMap extends JsonObject<Map<String, JsonObject<?>>> {
 		return value.get(key).asArray();
 	}
 
-	public List<JsonObject<?>> getArrayElements(String key){
+	public List<JsonValue<?>> getArrayElements(String key){
 		return getArray(key).elements();
 	}
 	
@@ -56,11 +56,11 @@ public class JsonMap extends JsonObject<Map<String, JsonObject<?>>> {
 		return value.get(key).asMap();
 	}
 	
-	public JsonObject<?> add(String key, JsonObject<?> elm){
+	public JsonValue<?> add(String key, JsonValue<?> elm){
 		return value.put(key, elm);
 	}
 	
-	public JsonObject<?> rem(String key){
+	public JsonValue<?> rem(String key){
 		return value.remove(key);
 	}
 	
@@ -78,7 +78,7 @@ public class JsonMap extends JsonObject<Map<String, JsonObject<?>>> {
 		return !any;
 	}
 	
-	public boolean contains(JsonObject<?> val){
+	public boolean contains(JsonValue<?> val){
 		return value.containsValue(val);
 	}
 	
@@ -92,47 +92,47 @@ public class JsonMap extends JsonObject<Map<String, JsonObject<?>>> {
 		return false;
 	}
 	
-	public JsonObject<?> add(String key, String val){
-		return add(key, new JsonObject<String>(val));
+	public JsonValue<?> add(String key, String val){
+		return add(key, new JsonValue<String>(val));
 	}
 	
-	public JsonObject<?> add(String key, byte val){
-		return add(key, new JsonObject<Byte>(val));
+	public JsonValue<?> add(String key, byte val){
+		return add(key, new JsonValue<Byte>(val));
 	}
 	
-	public JsonObject<?> add(String key, char val){
-		return add(key, new JsonObject<Character>(val));
+	public JsonValue<?> add(String key, char val){
+		return add(key, new JsonValue<Character>(val));
 	}
 	
-	public JsonObject<?> add(String key, short val){
-		return add(key, new JsonObject<Short>(val));
+	public JsonValue<?> add(String key, short val){
+		return add(key, new JsonValue<Short>(val));
 	}
 	
-	public JsonObject<?> add(String key, int val){
-		return add(key, new JsonObject<Integer>(val));
+	public JsonValue<?> add(String key, int val){
+		return add(key, new JsonValue<Integer>(val));
 	}
 	
-	public JsonObject<?> add(String key, long val){
-		return add(key, new JsonObject<Long>(val));
+	public JsonValue<?> add(String key, long val){
+		return add(key, new JsonValue<Long>(val));
 	}
 	
-	public JsonObject<?> add(String key, float val){
-		return add(key, new JsonObject<Float>(val));
+	public JsonValue<?> add(String key, float val){
+		return add(key, new JsonValue<Float>(val));
 	}
 	
-	public JsonObject<?> add(String key, double val){
-		return add(key, new JsonObject<Double>(val));
+	public JsonValue<?> add(String key, double val){
+		return add(key, new JsonValue<Double>(val));
 	}
 
-	public JsonObject<?> add(String key, boolean val){
-		return add(key, new JsonObject<Boolean>(val));
+	public JsonValue<?> add(String key, boolean val){
+		return add(key, new JsonValue<Boolean>(val));
 	}
 	
-	public JsonObject<?> addArray(String key){
+	public JsonValue<?> addArray(String key){
 		return add(key, new JsonArray());
 	}
 	
-	public JsonObject<?> addMap(String key){
+	public JsonValue<?> addMap(String key){
 		return add(key, new JsonMap());
 	}
 	
@@ -148,7 +148,7 @@ public class JsonMap extends JsonObject<Map<String, JsonObject<?>>> {
 		return value.size() > 0;
 	}
 
-	public Set<Entry<String, JsonObject<?>>> entries(){
+	public Set<Entry<String, JsonValue<?>>> entries(){
 		return value.entrySet();
 	}
 	
@@ -192,7 +192,7 @@ public class JsonMap extends JsonObject<Map<String, JsonObject<?>>> {
 	@Override
 	public JsonMap copy(){
 		JsonMap map = new JsonMap();
-		for(Entry<String, JsonObject<?>> entry : entries()){
+		for(Entry<String, JsonValue<?>> entry : entries()){
 			map.add(entry.getKey(), entry.getValue().copy());
 		}
 		return map;
