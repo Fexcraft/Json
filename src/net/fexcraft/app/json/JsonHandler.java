@@ -94,7 +94,7 @@ public class JsonHandler {
 						root.add(key, parseArray(new JsonArray(), isw));
 					}
 					else if(isw.cher == '"'){
-						root.add(key, parseValue(isw.till('"')));
+						root.add(key, isw.till('"'));
 					}
 					else{
 						root.add(key, parseValue(isw.till()));
@@ -113,7 +113,7 @@ public class JsonHandler {
 			while(isw.has()){
 				isw.skip();
 				if(isw.cher == '"'){
-					root.add(parseValue(isw.till('"')));
+					root.add(isw.till('"'));
 				}
 				else if(isw.cher == '{'){
 					root.add(parseMap(new JsonMap(), isw));
