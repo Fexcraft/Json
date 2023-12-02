@@ -165,6 +165,10 @@ public class JsonMap extends JsonValue<Map<String, JsonValue<?>>> {
 		return value.containsKey(key) ? value.get(key).float_value() : def;
 	}
 
+	public Float getFloat(String key, Float def){
+		return value.containsKey(key) ? value.get(key).float_value() : def;
+	}
+
 	public int getInteger(String key, int def){
 		return value.containsKey(key) ? value.get(key).integer_value() : def;
 	}
