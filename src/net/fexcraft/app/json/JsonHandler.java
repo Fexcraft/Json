@@ -247,12 +247,15 @@ public class JsonHandler {
 				ret += "[]" + app + n;
 			}
 			else{
-				ret += "[" + space + n;
+				boolean flat = obj instanceof JsonArray.Flat;
+				ret += "[" + space + (flat ? "" : n);
 				Iterator<JsonValue<?>> it = obj.asArray().value.iterator();
 				while(it.hasNext()){
-					ret += tab + tabo + toString(it.next(), depth + 1, it.hasNext(), opt);
+					if(!flat) ret += tab + tabo;
+					ret += toString(it.next(), depth + 1, it.hasNext(), flat ? PrintOption.FLAT_SPACED : opt);
 				}
-				ret += tab + space + "]" + app + n;
+				if(!flat) ret += tab;
+				ret += space + "]" + app + n;
 			}
 		}
 		else{
@@ -265,6 +268,7 @@ public class JsonHandler {
 		
 		public static final PrintOption FLAT = new PrintOption().flat(true).spaced(false);
 		public static final PrintOption SPACED = new PrintOption().flat(false).spaced(true);
+		public static final PrintOption FLAT_SPACED = new PrintOption().flat(true).spaced(true);
 		public static final PrintOption DEFAULT = SPACED;
 		
 		boolean flat, spaced;
