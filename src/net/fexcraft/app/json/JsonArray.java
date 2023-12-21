@@ -90,6 +90,7 @@ public class JsonArray extends JsonValue<List<JsonValue<?>>> {
 	}
 	
 	public boolean add(float val){
+		if(val == 0) val = 0;
 		return add(new JsonValue<Float>(val));
 	}
 	
@@ -174,5 +175,7 @@ public class JsonArray extends JsonValue<List<JsonValue<?>>> {
 		for(JsonValue val : value) list.add(val.float_value());
 		return list;
 	}
+
+	public static class Flat extends JsonArray {}
 
 }
