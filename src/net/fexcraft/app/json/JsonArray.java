@@ -176,6 +176,20 @@ public class JsonArray extends JsonValue<List<JsonValue<?>>> {
 		return list;
 	}
 
-	public static class Flat extends JsonArray {}
+	public static class Flat extends JsonArray {
+
+		public Flat(){
+			super();
+		}
+
+		public Flat(int size){
+			super(size);
+		}
+
+		public Flat(Object... elms){
+			super(elms);
+		}
+
+	}
 
 }
