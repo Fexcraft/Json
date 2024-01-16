@@ -324,6 +324,7 @@ public class JsonHandler {
 
 	public static JsonMap wrap(Map<String, Object> map, JsonMap json){
 		if(json == null) json = new JsonMap();
+		if(map == null) return json;
 		for(Entry<String, Object> entry : map.entrySet()){
 			if(entry.getValue() instanceof Collection){
 				json.add(entry.getKey(), wrap((Collection<?>)entry.getValue(), null));
