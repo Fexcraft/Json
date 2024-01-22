@@ -5,3 +5,7 @@
 *.prefs
 *.iml
 *.sh
+
+.idea
+gradle/
+gradlew*
