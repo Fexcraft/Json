@@ -217,8 +217,12 @@ public class JsonHandler {
 	}
 
 	public static String toString(JsonValue<?> obj, int depth, boolean append, PrintOption opt){
-		String ret = "", tab = "", tabo = "    ", space = opt.spaced ? " " : "", colspace = !opt.flat || opt.spaced ? " " : "";
-		String app = append ? "," + space : "", n = opt.flat ? "" : "\n";
+		String ret = "", tab = "", tabo = "    ";
+		String space = opt.spaced ? " " : "";
+		String colspace = !opt.flat || opt.spaced ? " " : "";
+		String clospace = opt.flat ? " " : "";
+		String app = append ? "," + space : "";
+		String n = opt.flat ? "" : "\n";
 		if(!opt.flat){
 			for(int j = 0; j < depth; j++){
 				tab += tabo;
@@ -239,7 +243,7 @@ public class JsonHandler {
 					Map.Entry<String, JsonValue<?>> entry = it.next();
 					ret += tab + tabo + '"' + entry.getKey() + '"' + ":" + colspace + toString(entry.getValue(), depth + 1, it.hasNext(), opt);
 				}
-				ret += tab + space + "}" + app + n;
+				ret += tab + clospace + "}" + app + n;
 			}
 		}
 		else if(obj.isArray()){
@@ -255,7 +259,7 @@ public class JsonHandler {
 					ret += toString(it.next(), depth + 1, it.hasNext(), flat ? PrintOption.FLAT_SPACED : opt);
 				}
 				if(!flat) ret += tab;
-				ret += space + "]" + app + n;
+				ret += clospace + "]" + app + n;
 			}
 		}
 		else{
