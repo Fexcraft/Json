@@ -251,7 +251,7 @@ public class JsonHandler {
 				ret += "[]" + app + n;
 			}
 			else{
-				boolean flat = obj instanceof JsonArray.Flat;
+				boolean flat = obj instanceof JsonArray.Flat || shouldBeFlat(obj.asArray());
 				ret += "[" + space + (flat ? "" : n);
 				Iterator<JsonValue<?>> it = obj.asArray().value.iterator();
 				while(it.hasNext()){
@@ -259,7 +259,7 @@ public class JsonHandler {
 					ret += toString(it.next(), depth + 1, it.hasNext(), flat ? PrintOption.FLAT_SPACED : opt);
 				}
 				if(!flat) ret += tab;
-				ret += clospace + "]" + app + n;
+				ret += (flat && !opt.flat ? " " : clospace) + "]" + app + n;
 			}
 		}
 		else{
@@ -267,7 +267,14 @@ public class JsonHandler {
 		}
 		return ret;
 	}
-	
+
+	private static boolean shouldBeFlat(JsonArray array){
+		for(JsonValue val : array.elements()){
+			if(val.value instanceof Number == false) return false;
+		}
+		return true;
+	}
+
 	public static class PrintOption {
 		
 		public static final PrintOption FLAT = new PrintOption().flat(true).spaced(false);
