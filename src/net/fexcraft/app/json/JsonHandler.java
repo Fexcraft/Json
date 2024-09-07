@@ -62,7 +62,7 @@ public class JsonHandler {
 		try{
 			return parse(new FileInputStream(file), defmap);
 		}
-		catch(IOException e){
+		catch(Exception e){
 			e.printStackTrace();
 			return defmap ? new JsonMap() : new JsonArray();
 		}
