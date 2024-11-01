@@ -307,6 +307,10 @@ public class JsonHandler {
 		}
 	}
 
+	public static void print(File file, JsonValue<?> obj){
+		print(file, obj, PrintOption.DEFAULT);
+	}
+
 	public static JsonMap parseURL(String... adr){
 		try{
 			URL url = new URL(adr[0]);
